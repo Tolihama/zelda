@@ -1,5 +1,6 @@
 // MODULES
 const fs = require('fs'); // filesystem module
+const term = require( 'terminal-kit' ).terminal;
 
 // ASSETS
 
@@ -12,5 +13,5 @@ fs.readFile('./assets/Start.txt', 'utf-8', printTxt);
 // FUNCTIONS
 function printTxt(err, data) {
     if(err) throw err;
-    console.log(data);
+    term.red(data);
 }
