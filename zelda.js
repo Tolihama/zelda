@@ -15,6 +15,7 @@ const startText = fs.readFileSync('./assets/Start.txt', { encoding: 'utf8' });
 // GLOBAL VARS
 let currentRoom = 1;
 let isGameOver = false;
+let isValidInput = false;
 
 // STARTS GAME
 const username = prompt("What's your name? >");
@@ -26,8 +27,8 @@ blankLines(3);
 
 // MAIN LOOP
 while(!isGameOver) {
+    isValidInput = false; // Reset the flag
     showRoomData(retrieveRoomData(currentRoom));
-    let isValidInput = false;
     while(!isValidInput) {
         const userComand = prompt('What do you want to do? >');
         validateCommand(userComand.trim());
