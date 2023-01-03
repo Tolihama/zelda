@@ -1,0 +1,83 @@
+[
+    {
+        "id": 1,
+        "description": "Room 1",
+        "north": null,
+        "east": 2,
+        "south": 4,
+        "west": 0,
+        "items": []
+    },
+    {
+        "id": 2,
+        "description": "Room 2",
+        "north": null,
+        "east": 3,
+        "south": 5,
+        "west": 1,
+        "items": [1]
+    },
+    {
+        "id": 3,
+        "description": "Room 3",
+        "north": null,
+        "east": null,
+        "south": null,
+        "west": 2,
+        "items": [2]
+    },
+    {
+        "id": 4,
+        "description": "Room 4",
+        "north": 1,
+        "east": null,
+        "south": null,
+        "west": null,
+        "items": [3]
+    },
+    {
+        "id": 5,
+        "description": "Room 5",
+        "north": 2,
+        "east": 6,
+        "south": null,
+        "west": null,
+        "items": []
+    },
+    {
+        "id": 6,
+        "description": "Room 6",
+        "north": null,
+        "east": null,
+        "south": null,
+        "west": 5,
+        "items": [0]
+    },
+    {
+        "id": 7,
+        "description": "Room 7",
+        "north": null,
+        "east": 8,
+        "south": null,
+        "west": null,
+        "items": [4]
+    },
+    {
+        "id": 8,
+        "description": "Room 8",
+        "north": 5,
+        "east": null,
+        "south": null,
+        "west": 4,
+        "items": [5]
+    },
+    {
+        "id": 9,
+        "description": "Room 9",
+        "north": 6,
+        "east": null,
+        "south": null,
+        "west": null,
+        "items": []
+    }
+]

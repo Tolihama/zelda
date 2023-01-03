@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "name": "Golden Egg",
+        "value": 500000
+    },
+    {
+        "id": 2,
+        "name": "Magic Shield",
+        "value": 0
+    },
+    {
+        "id": 3,
+        "name": "Golden Chalice",
+        "value": 500000
+    },
+    {
+        "id": 4,
+        "name": "Dagger",
+        "value": 0
+    },
+    {
+        "id": 5,
+        "name": "Proof Paper",
+        "value": 1000000
+    }
+]
