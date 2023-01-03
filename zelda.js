@@ -1,4 +1,4 @@
-console.log('Loading game...');
+console.log('Loading game...\n');
 
 // NODE MODULES
 const fs = require('fs'); // filesystem module
@@ -20,16 +20,16 @@ let roomData;
 let isGameOver = false;
 let isValidInput = false;
 const storyEventsList = [];
-const itemsInBagList = [];
+const itemsInBagList = [3];
 
 // STARTS GAME
-console.log("Hello Hero! What's your name?");
+term.green("Hello Hero! What's your name?\n");
 const username = prompt();
 blankLines(1);
 console.log(`Welcome ${username}!`);
-blankLines(2);
+blankLines(1);
 term.green(fs.readFileSync('./data/Start.txt')); // Show introduction
-blankLines(3);
+blankLines(2);
 
 // MAIN LOOP
 while(!isGameOver) {
@@ -83,10 +83,26 @@ function showRoomData(room) {
     }
 
     // Print bag and cash recap
-    console.log('Your bag contains the following items:\n');
+    const itemsInBagValueList = [];
+    term.cyan('\nYour bag contains the following items:');
+    if(itemsInBagList.length > 0) {
+        itemsInBagList.forEach( itemID => {
+            for(let i = 0; i < items.length; i++) {
+                if(items[i].id == itemID) {
+                    itemsInBagValueList.push(items[i].value);
+                    term.cyan(`\n- ${items[i].name} (value: ${items[i].value.toLocaleString('it-IT')} $)`);
+                    break;
+                }
+            }
+        });
+    } else {
+        console.log("\nCurrently, your bag is empty.");
+    }
+    const totalCash = itemsInBagValueList.length > 0 ? itemsInBagValueList.reduce( (prev, next) => prev + next) : 0;
+    term.yellow(`\nCurrent cash: ${totalCash.toLocaleString('it-IT')} $\n`);
 
     // Print remainder for available commands
-    console.log('Available Commands: MOVE, PICK, DROP, EXIT, ATTACK, LOOK\n');
+    console.log('\nAvailable Commands: MOVE, PICK, DROP, ATTACK, LOOK, EXIT, HELP\nNote: inputs are case insensitive.\n');
 }
 
 function validateCommand(textInput) {
