@@ -1,83 +1,101 @@
 [
     {
         "id": 1,
-        "description": "Room 1",
+        "name": "Room 1",
+        "description": "Room 1 description",
         "north": null,
         "east": 2,
         "south": 4,
         "west": 0,
-        "items": []
+        "items": [],
+        "monster": null
     },
     {
         "id": 2,
-        "description": "Room 2",
+        "name": "Room 2",
+        "description": "Room 2 description",
         "north": null,
         "east": 3,
         "south": 5,
         "west": 1,
-        "items": [1]
+        "items": [1],
+        "monster": null
     },
     {
         "id": 3,
-        "description": "Room 3",
+        "name": "Room 3",
+        "description": "Room 3 description",
         "north": null,
         "east": null,
         "south": null,
         "west": 2,
-        "items": [2]
+        "items": [2],
+        "monster": null
     },
     {
         "id": 4,
-        "description": "Room 4",
+        "name": "Room 4",
+        "description": "Room 4 description",
         "north": 1,
         "east": null,
         "south": null,
         "west": null,
-        "items": [3]
+        "items": [3],
+        "monster": null
     },
     {
         "id": 5,
-        "description": "Room 5",
+        "name": "Room 5",
+        "description": "Room 5 description",
         "north": 2,
         "east": 6,
         "south": null,
         "west": null,
-        "items": []
+        "items": [],
+        "monster": 1
     },
     {
         "id": 6,
-        "description": "Room 6",
+        "name": "Room 6",
+        "description": "Room 6 description",
         "north": null,
         "east": null,
         "south": null,
         "west": 5,
-        "items": [0]
+        "items": [],
+        "monster": 2
     },
     {
         "id": 7,
-        "description": "Room 7",
+        "name": "Room 7",
+        "description": "Room 7 description",
         "north": null,
         "east": 8,
         "south": null,
         "west": null,
-        "items": [4]
+        "items": [4],
+        "monster": null
     },
     {
         "id": 8,
-        "description": "Room 8",
+        "name": "Room 8",
+        "description": "Room 8 description",
         "north": 5,
         "east": null,
         "south": null,
         "west": 4,
-        "items": [5]
+        "items": [5],
+        "monster": null
     },
     {
         "id": 9,
-        "description": "Room 9",
+        "name": "Room 9",
+        "description": "Room 9 description",
         "north": 6,
         "east": null,
         "south": null,
         "west": null,
-        "items": []
+        "items": [],
+        "monster": null
     }
 ]
