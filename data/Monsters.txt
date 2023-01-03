@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "name": "Medusa",
+        "itemRequiredToKill": 1
+    },
+    {
+        "id": 2,
+        "name": "Dracula",
+        "itemRequiredToKill": 4
+    }
+]
