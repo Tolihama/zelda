@@ -20,7 +20,7 @@ let roomData;
 let isGameOver = false;
 let isValidInput = false;
 const storyEventsList = [];
-const itemsInBagList = [3];
+const itemsInBagList = [];
 
 // STARTS GAME
 term.green("Hello Hero! What's your name?\n");
@@ -65,7 +65,7 @@ function showRoomData(room) {
         room.items.forEach( itemID => {
             for(let i = 0; i < items.length; i++) {
                 if(items[i].id == itemID) {
-                    console.log(`There is a ${items[i].name.toUpperCase()} on the floor.\n`);
+                    console.log(`There is a ${items[i].name.toUpperCase()} on the floor.`);
                     break;
                 }
             }
@@ -76,7 +76,7 @@ function showRoomData(room) {
     if(room.monster != null) {
         for(let i = 0; i < monsters.length; i++) {
             if(monsters[i].id === room.monster) {
-                console.log(`${monsters[i].name} is waiting to kill you beside a locked door.\n`);
+                console.log(`${monsters[i].name} is waiting to kill you beside a locked door.`);
                 break;
             }
         }
@@ -116,11 +116,16 @@ function validateCommand(textInput) {
                 return;
             }
             break;
-        case 'exit':
-            isGameOver = true;
+        case 'pick':
+            pick(textInputArr[1]);
+            break;
+        case 'drop':
             break;
         case 'look':
             break; // It's actually a no action: run another iteration of the main loop, showing the info about current room
+        case 'exit':
+            isGameOver = true;
+            break;
         default:
             invalidCommand();
             return;
@@ -144,6 +149,30 @@ function moveAction(dir) {
 
     // Last case: there is a room in that direction, so move in
     currentRoom = roomData[dir];
+}
+
+
+/* FUNZIONE ROTTA: LA FUNZIONE PICK NON CONSIDERA IL PARAMETRO, INOLTRE C'è UN PROBLEMA PER I NOMI DI ITEM CON GLI SPAZI */
+function pick(item) {
+    const itemsInRoom = rooms[currentRoom - 1].items;
+    if(itemsInRoom.length > 0) {
+        itemsInRoom.forEach( itemID => {
+            for(let i = 0; i < items.length; i++) {
+                if(items[i].id == itemID) {
+                    itemsInBagList.push(items[i].id);
+                    itemsInRoom.splice(i, 1);
+                    term.cyan(`\n- You picked a ${items[i].name}.`);
+                    break;
+                }
+            }
+        });
+    } else {
+        term.red(`\NThere is no ${item} in this room!`);
+    }
+}
+
+function drop() {
+
 }
 
 function noDeathEnding() {
