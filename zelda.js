@@ -65,7 +65,7 @@ function showRoomData(room) {
         room.items.forEach( itemID => {
             for(let i = 0; i < items.length; i++) {
                 if(items[i].id == itemID) {
-                    console.log(`There is a ${items[i].name.toUpperCase()} on the floor.`);
+                    console.log(`\nThere is a ${items[i].name.toUpperCase()} on the floor.`);
                     break;
                 }
             }
@@ -84,22 +84,22 @@ function showRoomData(room) {
 
     // Print bag and cash recap
     const itemsInBagValueList = [];
-    term.cyan('\nYour bag contains the following items:');
+    term.cyan('\nYour bag contains the following items:\n');
     if(itemsInBagList.length > 0) {
         itemsInBagList.forEach( itemID => {
             for(let i = 0; i < items.length; i++) {
                 if(items[i].id == itemID) {
                     itemsInBagValueList.push(items[i].value);
-                    term.cyan(`\n- ${items[i].name} (value: ${items[i].value.toLocaleString('it-IT')} $)`);
+                    term.cyan(`- ${items[i].name} (value: ${items[i].value.toLocaleString('it-IT')} $)\n`);
                     break;
                 }
             }
         });
     } else {
-        console.log("\nCurrently, your bag is empty.");
+        console.log("Currently, your bag is empty.");
     }
     const totalCash = itemsInBagValueList.length > 0 ? itemsInBagValueList.reduce( (prev, next) => prev + next) : 0;
-    term.yellow(`\nCurrent cash: ${totalCash.toLocaleString('it-IT')} $\n`);
+    term.yellow(`Current cash: ${totalCash.toLocaleString('it-IT')} $\n`);
 
     // Print remainder for available commands
     console.log('\nAvailable Commands: MOVE, PICK, DROP, ATTACK, LOOK, EXIT, HELP\nNote: inputs are case insensitive.\n');
@@ -127,6 +127,7 @@ function validateCommand(textInput) {
             pick(commandSelector);
             break;
         case 'drop':
+            drop(commandSelector);
             break;
         case 'look':
             term.green("\nYou look around.");
@@ -141,7 +142,8 @@ function validateCommand(textInput) {
     }
     isValidInput = true;
     blankLines(1);
-    sleep(1500);
+    term.blue('###########################');
+    blankLines(1);
 }
 
 function moveAction(dir) {
@@ -151,40 +153,118 @@ function moveAction(dir) {
         return;
     }
 
-    // There is the exit of the maze in that direction: trigger the noDeathEnding
+    // There is the exit of the maze in that direction: ask confirm
     if(roomData[dir] === 0) {
-        noDeathEnding();
-        return;
+
+        blankLines(1);
+        const princessNotFoundString = storyEventsList.includes(3) ? "" : " You didn't found the princess yet.";
+        term.red(`This is the exit.${princessNotFoundString} Moving in that direction will conclude your adventure. Are you sure to proceed? [YES | NO]\n`);
+        const userConfirm = prompt();
+        blankLines(1);
+
+        switch(userConfirm.toLocaleLowerCase().trim()) {
+            // If action is confirmed, trigger the noDeathEnding
+            case 'yes':
+                noDeathEnding();
+                return;
+            // Otherwise, cancel the comand
+            case 'no':
+                term.red('You changed your mind and decided to not proceed.');
+                return;
+            // If the answer is invalid, cancel the comand and print a "invalid command" message
+            default:
+                invalidCommand();
+                return;
+        }
     }
 
     // Last case: there is a room in that direction, so move in
     currentRoom = roomData[dir];
+    term.red(`You moved to ${dir}.`);
 }
 
 /**
  * Command PICK function. Takes a string as parameter with the name of the item the user wants to pick.
  * @param {string} item 
+ * @returns void
  */
 function pick(item) {
     const itemsInRoom = rooms[currentRoom - 1].items;
+    let itemExistInRoom = false;
+
     if(itemsInRoom.length > 0) {
-        itemsInRoom.forEach( itemID => {
-            for(let i = 0; i < items.length; i++) {
-                if(items[i].id == itemID) {
-                    itemsInBagList.push(items[i].id);
+        // Search the item requested by user in the all items array, so you have the item ID
+        let itemID;
+        let itemName;
+        for(let i = 0; i < items.length; i++) {
+            if(items[i].name.toLocaleLowerCase() === item) {
+                itemID = items[i].id;
+                itemName = items[i].name;
+                break;
+            }
+        }
+
+        // If you find an existing item, you can search its id in the itemsInRoom array, add it in the bag array and remove from the itemsInRoom array
+        if(typeof itemID === 'number') {
+
+            for(let i = 0; i < itemsInRoom.length; i++) {
+
+                if(itemsInRoom[i] === itemID) {
+                    itemExistInRoom = true;
+    
+                    itemsInBagList.push(itemID);
                     itemsInRoom.splice(i, 1);
-                    term.cyan(`\n- You picked a ${items[i].name}.`);
+
+                    term.green(`\nYou picked a ${itemName}.`);
                     break;
                 }
+
             }
-        });
-    } else {
-        term.red(`\nThere is no ${item} in this room!`);
+        }
     }
+    
+    if(!itemExistInRoom) term.red(`\nThere is no ${item} in this room!`);
 }
 
-function drop() {
+/**
+ * 
+ */
+function drop(item) {
+    const itemsInRoom = rooms[currentRoom - 1].items;
+    let itemExistInBag = false;
 
+    if(itemsInBagList.length > 0) {
+        // Search the item requested by user in the all items array, so you have the item ID
+        let itemID;
+        let itemName;
+        for(let i = 0; i < items.length; i++) {
+            if(items[i].name.toLocaleLowerCase() === item) {
+                itemName = items[i].name;
+                itemID = items[i].id;
+                break;
+            } 
+        }
+
+        // If you find an existing item, you can search its id in the itemsInBag array, add it in the itemsinRoom array and remove from the bag
+        if(typeof itemID === 'number') {
+
+            for(let i = 0; i < itemsInBagList.length; i++) {
+
+                if(itemsInBagList[i] === itemID) {
+                    itemExistInBag = true;
+    
+                    itemsInRoom.push(itemID);
+                    itemsInBagList.splice(i, 1);
+
+                    term.green(`\nYou picked a ${itemName}.`);
+                    break;
+                }
+
+            }
+        }
+    }
+    
+    if(!itemExistInBag) term.red(`\nThere is no ${item} in your bag!`);
 }
 
 function noDeathEnding() {
@@ -213,15 +293,4 @@ function blankLines(lines = 1) {
         blankLines += "\n";
     }
     console.log(blankLines);
-}
-
-async function sleep(ms) {
-    console.log('DEBUG: funzione sleep')
-    await sleepPromise(ms);
-}
-   
-function sleepPromise(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
 }
