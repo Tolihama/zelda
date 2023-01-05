@@ -3,4 +3,4 @@ Reference only!
 Story Events List:
 1: Medusa defeated
 2: Dracula defeated
-3: Princess rescued
+3: Princess found
