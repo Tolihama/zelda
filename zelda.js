@@ -39,7 +39,7 @@ while(!isGameOver) {
     while(!isValidInput) {
         console.log("What do you want to do?");
         const userCommand = prompt();
-        validateCommand(userCommand.trim());
+        validateCommand(userCommand.trim().toLocaleLowerCase());
     }
 }
 
@@ -57,7 +57,7 @@ function showRoomData(room) {
 
     // Print available directions
     ['north', 'east', 'south', 'west'].forEach(dir => {
-        if(room[dir] != null) term.blue(`There is a room to your ${dir.charAt(0).toUpperCase()}${dir.slice(1)}.\n`);
+        if(room[dir] != null) term.blue(`There is a room to your ${dir.charAt(0).toUpperCase()}${dir.slice(1)}. `);
     });
 
     // Print available items in the room
@@ -105,26 +105,35 @@ function showRoomData(room) {
     console.log('\nAvailable Commands: MOVE, PICK, DROP, ATTACK, LOOK, EXIT, HELP\nNote: inputs are case insensitive.\n');
 }
 
+/**
+ * Takes a string (trimmed and in lowercase) and validates as a valid command in the game
+ * @param {string} textInput 
+ * @returns void
+ */
 function validateCommand(textInput) {
-    const textInputArr = textInput.toLowerCase().split(' ');
-    switch(textInputArr[0]) {
+    const textInputArr = textInput.split(' ');
+    const command = textInputArr[0];
+    const commandSelector = textInputArr.splice(1).join(' ');
+    switch(command) {
         case 'move':
-            if(['north', 'east', 'south', 'west'].includes(textInputArr[1])) {
-                moveAction(textInputArr[1]);
+            if(['north', 'east', 'south', 'west'].includes(commandSelector)) {
+                moveAction(commandSelector);
             } else {
                 invalidCommand();
                 return;
             }
             break;
         case 'pick':
-            pick(textInputArr[1]);
+            pick(commandSelector);
             break;
         case 'drop':
             break;
         case 'look':
+            term.green("\nYou look around.");
             break; // It's actually a no action: run another iteration of the main loop, showing the info about current room
         case 'exit':
             isGameOver = true;
+            term.red("\nYou quit the game. Goodbye!");
             break;
         default:
             invalidCommand();
@@ -132,6 +141,7 @@ function validateCommand(textInput) {
     }
     isValidInput = true;
     blankLines(1);
+    sleep(1500);
 }
 
 function moveAction(dir) {
@@ -151,8 +161,10 @@ function moveAction(dir) {
     currentRoom = roomData[dir];
 }
 
-
-/* FUNZIONE ROTTA: LA FUNZIONE PICK NON CONSIDERA IL PARAMETRO, INOLTRE C'è UN PROBLEMA PER I NOMI DI ITEM CON GLI SPAZI */
+/**
+ * Command PICK function. Takes a string as parameter with the name of the item the user wants to pick.
+ * @param {string} item 
+ */
 function pick(item) {
     const itemsInRoom = rooms[currentRoom - 1].items;
     if(itemsInRoom.length > 0) {
@@ -167,7 +179,7 @@ function pick(item) {
             }
         });
     } else {
-        term.red(`\NThere is no ${item} in this room!`);
+        term.red(`\nThere is no ${item} in this room!`);
     }
 }
 
@@ -186,13 +198,30 @@ function noDeathEnding() {
 
 function invalidCommand() {
     isValidInput = false;
-    console.log('Invalid command.');
+    term.red('Invalid command.');
 }
 
+/* UTILITIES FUNCTION */
+/**
+ * Prints blank lines on the console
+ * @param {string} lines 
+ * @returns void
+ */
 function blankLines(lines = 1) {
     let blankLines = "";
     for(let i = 1; i <= lines; i++) {
         blankLines += "\n";
     }
     console.log(blankLines);
+}
+
+async function sleep(ms) {
+    console.log('DEBUG: funzione sleep')
+    await sleepPromise(ms);
+}
+   
+function sleepPromise(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
