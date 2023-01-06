@@ -1,8 +1,10 @@
+// IMPORTS
 const fs = require('fs'); // filesystem module
 const path = require('path');
 const term = require( 'terminal-kit' ).terminal;
 const rooms = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data/Rooms.txt')).toString().trim());
 
+// STORY EVENTS
 const storyEvents = [
     // Event 1: Medusa is killed
     {
@@ -35,8 +37,6 @@ const storyEvents = [
     }
 ];
 
-module.exports.fs = fs;
-module.exports.path = path;
-module.exports.term = term;
+// MODULE EXPORT
 module.exports.rooms = rooms;
 module.exports.storyEvents = storyEvents;

@@ -1,3 +1,4 @@
-Sei morto!
+You tried to kill the enemy but you haven't the right item to use against... unfortunely, this costs your life.
+No hero will come to save the Princess...
 
 Bad Ending: 2.

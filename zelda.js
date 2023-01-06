@@ -1,25 +1,37 @@
 console.log('Loading game...\n');
 
+// NODE MODULES
+const fs = require('fs'); // filesystem module
+
 // DEPENDENCIES
+const term = require( 'terminal-kit' ).terminal;
 const prompt = require('prompt-sync')({
     sigint: true,
 });
 
 // ASSETS
-const { fs, path, term, rooms, storyEvents } = require("./js/storyEvents.js");
-const items     = JSON.parse(fs.readFileSync('./data/Items.txt').toString().trim());
-const monsters  = JSON.parse(fs.readFileSync('./data/Monsters.txt').toString().trim());
+const items = JSON.parse(fs.readFileSync('./data/Items.txt').toString().trim());
+const monsters = JSON.parse(fs.readFileSync('./data/Monsters.txt').toString().trim());
+const { rooms, storyEvents } = require("./js/storyEvents.js");
 
 // GLOBAL VARS
 let currentRoomIndex = 1;
 let currentRoomData;
 let nTurn = 1;
+let secondsPlayed = 0;
+let totalCash = 0;
 let isGameOver = false;
 let isValidInput = false;
 const storyEventsList = [];
 const itemsInBagList = [];
 
 // STARTS GAME
+const gameTimer = setInterval(() => {
+    console.log('timer')
+    secondsPlayed++;
+}, 1000);
+
+
 term.green("Hello Hero! What's your name?\n");
 const username = prompt();
 blankLines(1);
@@ -27,6 +39,7 @@ console.log(`Welcome ${username}!`);
 blankLines(1);
 term.green(fs.readFileSync('./data/Start.txt')); // Show introduction
 blankLines(1);
+
 
 // MAIN LOOP
 while(!isGameOver) {
@@ -48,14 +61,27 @@ while(!isGameOver) {
     nTurn++;
 }
 
+/**
+ * FUNCTIONS
+ */
 
-// FUNCTIONS
+/**
+ * Prints all info about current room
+ * @param {object} room 
+ */
 function showRoomData(room) {
     // Print current nTurn
     console.log(`\n##########################################\n\nTurn ${nTurn}.`);
 
     // Print current room number
-    term.brightRed(`Currently you are in Room ${room.id}. ${room.description}.\n`);
+    term.brightRed(`Currently you are in Room ${room.id}. ${room.description}\n`);
+
+    // Check if room has story event trigger
+    if(room.triggerSE != null && !storyEventsList.includes(room.triggerSE)) {
+        const se = searchInDataArrayById(room.triggerSE, storyEvents);
+        storyEventsList.push(se.id);
+        se.result();
+    }
 
     // Print available directions
     ['north', 'east', 'south', 'west'].forEach(dir => {
@@ -88,7 +114,7 @@ function showRoomData(room) {
     } else {
         console.log("Currently, your bag is empty.");
     }
-    const totalCash = itemsInBagValueList.length > 0 ? itemsInBagValueList.reduce( (prev, next) => prev + next) : 0;
+    totalCash = itemsInBagValueList.length > 0 ? itemsInBagValueList.reduce( (prev, next) => prev + next) : 0;
     term.yellow(`Current cash: ${totalCash.toLocaleString('it-IT')} $\n`);
 
     // Print remainder for available commands
@@ -247,9 +273,11 @@ function drop(requestedItem) {
  * 
  */
 function attack() {
+    blankLines(1);
+
     // There is no monster here!
     if(currentRoomData.monster === null) {
-        term.red("There is no target to attack here!.\n");
+        term.red("There is no target to attack here!\n");
         return;
     }
 
@@ -269,17 +297,32 @@ function attack() {
 
 
 function deathEnding() {
+    blankLines(1);
     term.red(fs.readFileSync('./data/EndDead.txt'));
     isGameOver = true;
+    endGameStats();
 }
 
 function noDeathEnding() {
+    blankLines(1);
     if(storyEventsList.includes(3)) {
         term.green(fs.readFileSync('./data/EndWin.txt'));
     } else {
         term.red(fs.readFileSync('./data/EndLose.txt'));
     }
     isGameOver = true;
+    endGameStats();
+}
+
+function endGameStats() {
+    clearInterval(gameTimer);
+    term.green(`\n\n
+##########################
+GAME STATISTICS
+
+Turns played: ${nTurn}
+Time played: ${convertSecondsInHHMMSS(secondsPlayed)}
+Total cash: ${totalCash.toLocaleString('it-IT')} $`);
 }
 
 function invalidCommand() {
@@ -324,4 +367,17 @@ function searchInDataArrayByName(name, data) {
         if(data[i].name.toLowerCase() === name.toLowerCase()) return data[i];
     }
     return null;
+}
+
+/**
+ * Converts seconds in time format HH:MM:SS
+ * @param {number} timeInSeconds 
+ * @returns {string} time in format HH:MM:SS
+ */
+function convertSecondsInHHMMSS(timeInSeconds) {
+    const hours = Math.floor(timeInSeconds / 3600).toString();
+    const minutes = Math.floor((timeInSeconds - (3600 * hours)) / 60).toString();
+    const seconds = (timeInSeconds - ((3600 * hours) + (60 * minutes))).toString();
+
+    return `${hours.length == 1 ? `0${hours}` : hours}:${minutes.length == 1 ? `0${minutes}` : minutes}:${seconds.length == 1 ? `0${seconds}` : seconds}`;
 }

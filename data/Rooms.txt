@@ -90,7 +90,7 @@
         "north": 5,
         "east": null,
         "south": null,
-        "west": 4,
+        "west": 7,
         "items": [5],
         "monster": null,
         "triggerSE": null
