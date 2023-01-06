@@ -16,9 +16,8 @@ const monsters = JSON.parse(fs.readFileSync('./data/Monsters.txt').toString().tr
 
 // GLOBAL VARS
 let currentRoom = 1;
-let roomData;
+let nTurn = 1;
 let isGameOver = false;
-let isValidInput = false;
 const storyEventsList = [];
 const itemsInBagList = [];
 
@@ -33,25 +32,28 @@ blankLines(2);
 
 // MAIN LOOP
 while(!isGameOver) {
-    isValidInput = false; // Reset the flag
-    roomData = retrieveRoomData(currentRoom);
-    showRoomData(roomData);
+    let isValidInput = false;
+
+    // Show room description and player stats
+    showRoomData(searchInDataArrayById(currentRoom, rooms));
+
+    // Ask valid command
     while(!isValidInput) {
         console.log("What do you want to do?");
         const userCommand = prompt();
         validateCommand(userCommand.trim().toLocaleLowerCase());
     }
+
+    // Go to next turn
+    nTurn++;
 }
 
 
 // FUNCTIONS
-function retrieveRoomData(roomNumber) {
-    for(let i = 0; i < rooms.length; i++) {
-        if(rooms[i].id === roomNumber) return rooms[i];
-    }
-}
-
 function showRoomData(room) {
+    // Print current nTurn
+    term.yellow(`Turn ${nTurn}.\n`);
+
     // Print current room number
     term.red(`Currently you are in Room ${room.id}. ${room.description}.\n`);
 
@@ -63,23 +65,15 @@ function showRoomData(room) {
     // Print available items in the room
     if(room.items.length > 0) {
         room.items.forEach( itemID => {
-            for(let i = 0; i < items.length; i++) {
-                if(items[i].id == itemID) {
-                    console.log(`\nThere is a ${items[i].name.toUpperCase()} on the floor.`);
-                    break;
-                }
-            }
+            const item = searchInDataArrayById(itemID, items);
+            console.log(`\nThere is a ${item.name.toUpperCase()} on the floor.`);
         });
     }
     
     // Print monster description if there is one in the room
     if(room.monster != null) {
-        for(let i = 0; i < monsters.length; i++) {
-            if(monsters[i].id === room.monster) {
-                console.log(`${monsters[i].name} is waiting to kill you beside a locked door.`);
-                break;
-            }
-        }
+        const monster = searchInDataArrayById(room.monster, monsters);
+        console.log(`${monster.name} is waiting to kill you beside a locked door.`);
     }
 
     // Print bag and cash recap
@@ -87,13 +81,9 @@ function showRoomData(room) {
     term.cyan('\nYour bag contains the following items:\n');
     if(itemsInBagList.length > 0) {
         itemsInBagList.forEach( itemID => {
-            for(let i = 0; i < items.length; i++) {
-                if(items[i].id == itemID) {
-                    itemsInBagValueList.push(items[i].value);
-                    term.cyan(`- ${items[i].name} (value: ${items[i].value.toLocaleString('it-IT')} $)\n`);
-                    break;
-                }
-            }
+            const item = searchInDataArrayById(itemID, items);
+            itemsInBagValueList.push(items[i].value);
+            term.cyan(`- ${item.name} (value: ${ite.value.toLocaleString('it-IT')} $)\n`);
         });
     } else {
         console.log("Currently, your bag is empty.");
@@ -114,6 +104,7 @@ function validateCommand(textInput) {
     const textInputArr = textInput.split(' ');
     const command = textInputArr[0];
     const commandSelector = textInputArr.splice(1).join(' ');
+
     switch(command) {
         case 'move':
             if(['north', 'east', 'south', 'west'].includes(commandSelector)) {
@@ -140,7 +131,9 @@ function validateCommand(textInput) {
             invalidCommand();
             return;
     }
+
     isValidInput = true;
+
     blankLines(1);
     term.blue('###########################');
     blankLines(1);
@@ -188,34 +181,26 @@ function moveAction(dir) {
  * @param {string} item 
  * @returns void
  */
-function pick(item) {
+function pick(requestedItem) {
     const itemsInRoom = rooms[currentRoom - 1].items;
     let itemExistInRoom = false;
 
     if(itemsInRoom.length > 0) {
         // Search the item requested by user in the all items array, so you have the item ID
-        let itemID;
-        let itemName;
-        for(let i = 0; i < items.length; i++) {
-            if(items[i].name.toLocaleLowerCase() === item) {
-                itemID = items[i].id;
-                itemName = items[i].name;
-                break;
-            }
-        }
+        const item = searchInDataArrayByName(requestedItem, items)
 
         // If you find an existing item, you can search its id in the itemsInRoom array, add it in the bag array and remove from the itemsInRoom array
-        if(typeof itemID === 'number') {
+        if(item != null) {
 
             for(let i = 0; i < itemsInRoom.length; i++) {
 
-                if(itemsInRoom[i] === itemID) {
+                if(itemsInRoom[i] === item.id) {
                     itemExistInRoom = true;
     
-                    itemsInBagList.push(itemID);
+                    itemsInBagList.push(item.id);
                     itemsInRoom.splice(i, 1);
 
-                    term.green(`\nYou picked a ${itemName}.`);
+                    term.green(`\nYou picked a ${item.name}.`);
                     break;
                 }
 
@@ -223,40 +208,32 @@ function pick(item) {
         }
     }
     
-    if(!itemExistInRoom) term.red(`\nThere is no ${item} in this room!`);
+    if(!itemExistInRoom) term.red(`\nThere is no ${requestedItem} in this room!`);
 }
 
 /**
  * 
  */
-function drop(item) {
+function drop(requestedItem) {
     const itemsInRoom = rooms[currentRoom - 1].items;
     let itemExistInBag = false;
 
     if(itemsInBagList.length > 0) {
         // Search the item requested by user in the all items array, so you have the item ID
-        let itemID;
-        let itemName;
-        for(let i = 0; i < items.length; i++) {
-            if(items[i].name.toLocaleLowerCase() === item) {
-                itemName = items[i].name;
-                itemID = items[i].id;
-                break;
-            } 
-        }
+        const item = searchInDataArrayByName(requestedItem, items);
 
         // If you find an existing item, you can search its id in the itemsInBag array, add it in the itemsinRoom array and remove from the bag
-        if(typeof itemID === 'number') {
+        if(item != null) {
 
             for(let i = 0; i < itemsInBagList.length; i++) {
 
-                if(itemsInBagList[i] === itemID) {
+                if(itemsInBagList[i] === item.id) {
                     itemExistInBag = true;
     
-                    itemsInRoom.push(itemID);
+                    itemsInRoom.push(item.id);
                     itemsInBagList.splice(i, 1);
 
-                    term.green(`\nYou picked a ${itemName}.`);
+                    term.green(`\nYou picked a ${item.name}.`);
                     break;
                 }
 
@@ -264,7 +241,7 @@ function drop(item) {
         }
     }
     
-    if(!itemExistInBag) term.red(`\nThere is no ${item} in your bag!`);
+    if(!itemExistInBag) term.red(`\nThere is no ${requestedItem} in your bag!`);
 }
 
 function noDeathEnding() {
@@ -284,8 +261,7 @@ function invalidCommand() {
 /* UTILITIES FUNCTION */
 /**
  * Prints blank lines on the console
- * @param {string} lines 
- * @returns void
+ * @param {number} lines numbers of blank lines to print (default = 1) 
  */
 function blankLines(lines = 1) {
     let blankLines = "";
@@ -293,4 +269,30 @@ function blankLines(lines = 1) {
         blankLines += "\n";
     }
     console.log(blankLines);
+}
+
+/**
+ * Search a specific entity (data) by id in data arrays
+ * @param {number} id 
+ * @param {array} data 
+ * @returns {object}
+ */
+function searchInDataArrayById(id, data) {
+    for(let i = 0; i < data.length; i++) {
+        if(data[i].id === id) return data[i];
+    }
+    return null;
+}
+
+/**
+ * Search a specific entity (data) by name in data arrays
+ * @param {string} name 
+ * @param {array} data 
+ * @returns {object/null} the object requested if found, otherwise null
+ */
+function searchInDataArrayByName(name, data) {
+    for(let i = 0; i < data.length; i++) {
+        if(data[i].name.toLowerCase() === name.toLowerCase()) return data[i];
+    }
+    return null;
 }
