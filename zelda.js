@@ -15,9 +15,11 @@ const items = JSON.parse(fs.readFileSync('./data/Items.txt').toString().trim());
 const monsters = JSON.parse(fs.readFileSync('./data/Monsters.txt').toString().trim());
 
 // GLOBAL VARS
-let currentRoom = 1;
+let currentRoomIndex = 1;
+let currentRoomData;
 let nTurn = 1;
 let isGameOver = false;
+let isValidInput = false;
 const storyEventsList = [];
 const itemsInBagList = [];
 
@@ -32,10 +34,12 @@ blankLines(2);
 
 // MAIN LOOP
 while(!isGameOver) {
-    let isValidInput = false;
+    // Reset the valid input flag
+    isValidInput = false;
 
     // Show room description and player stats
-    showRoomData(searchInDataArrayById(currentRoom, rooms));
+    currentRoomData = searchInDataArrayById(currentRoomIndex, rooms);
+    showRoomData(currentRoomData);
 
     // Ask valid command
     while(!isValidInput) {
@@ -141,13 +145,13 @@ function validateCommand(textInput) {
 
 function moveAction(dir) {
     // There is a wall in that direction: invalid command
-    if(roomData[dir] === null) {
+    if(currentRoomData[dir] === null) {
         invalidCommand();
         return;
     }
 
     // There is the exit of the maze in that direction: ask confirm
-    if(roomData[dir] === 0) {
+    if(currentRoomData[dir] === 0) {
 
         blankLines(1);
         const princessNotFoundString = storyEventsList.includes(3) ? "" : " You didn't found the princess yet.";
@@ -172,7 +176,7 @@ function moveAction(dir) {
     }
 
     // Last case: there is a room in that direction, so move in
-    currentRoom = roomData[dir];
+    currentRoomIndex = currentRoomData[dir];
     term.red(`You moved to ${dir}.`);
 }
 
@@ -255,7 +259,7 @@ function noDeathEnding() {
 
 function invalidCommand() {
     isValidInput = false;
-    term.red('Invalid command.');
+    term.red('Invalid command.\n');
 }
 
 /* UTILITIES FUNCTION */
