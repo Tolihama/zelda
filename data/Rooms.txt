@@ -8,7 +8,8 @@
         "south": 4,
         "west": 0,
         "items": [],
-        "monster": null
+        "monster": null,
+        "triggerSE": null
     },
     {
         "id": 2,
@@ -19,7 +20,8 @@
         "south": 5,
         "west": 1,
         "items": [1],
-        "monster": null
+        "monster": null,
+        "triggerSE": null
     },
     {
         "id": 3,
@@ -30,7 +32,8 @@
         "south": null,
         "west": 2,
         "items": [2],
-        "monster": null
+        "monster": null,
+        "triggerSE": null
     },
     {
         "id": 4,
@@ -41,7 +44,8 @@
         "south": null,
         "west": null,
         "items": [3],
-        "monster": null
+        "monster": null,
+        "triggerSE": null
     },
     {
         "id": 5,
@@ -52,7 +56,8 @@
         "south": null,
         "west": null,
         "items": [],
-        "monster": 1
+        "monster": 1,
+        "triggerSE": null
     },
     {
         "id": 6,
@@ -63,7 +68,8 @@
         "south": null,
         "west": 5,
         "items": [],
-        "monster": 2
+        "monster": 2,
+        "triggerSE": null
     },
     {
         "id": 7,
@@ -74,7 +80,8 @@
         "south": null,
         "west": null,
         "items": [4],
-        "monster": null
+        "monster": null,
+        "triggerSE": null
     },
     {
         "id": 8,
@@ -85,7 +92,8 @@
         "south": null,
         "west": 4,
         "items": [5],
-        "monster": null
+        "monster": null,
+        "triggerSE": null
     },
     {
         "id": 9,
@@ -96,6 +104,7 @@
         "south": null,
         "west": null,
         "items": [],
-        "monster": null
+        "monster": null,
+        "triggerSE": 3
     }
 ]

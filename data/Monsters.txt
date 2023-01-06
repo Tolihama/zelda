@@ -2,11 +2,13 @@
     {
         "id": 1,
         "name": "Medusa",
-        "itemRequiredToKill": 1
+        "itemRequiredToKill": 2,
+        "storyEvent": 1
     },
     {
         "id": 2,
         "name": "Dracula",
-        "itemRequiredToKill": 4
+        "itemRequiredToKill": 4,
+        "storyEvent": 2
     }
 ]

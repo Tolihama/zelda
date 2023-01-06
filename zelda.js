@@ -1,18 +1,14 @@
 console.log('Loading game...\n');
 
-// NODE MODULES
-const fs = require('fs'); // filesystem module
-
 // DEPENDENCIES
-const term = require( 'terminal-kit' ).terminal;
 const prompt = require('prompt-sync')({
     sigint: true,
 });
 
 // ASSETS
-const rooms = JSON.parse(fs.readFileSync('./data/Rooms.txt').toString().trim());
-const items = JSON.parse(fs.readFileSync('./data/Items.txt').toString().trim());
-const monsters = JSON.parse(fs.readFileSync('./data/Monsters.txt').toString().trim());
+const { fs, path, term, rooms, storyEvents } = require("./js/storyEvents.js");
+const items     = JSON.parse(fs.readFileSync('./data/Items.txt').toString().trim());
+const monsters  = JSON.parse(fs.readFileSync('./data/Monsters.txt').toString().trim());
 
 // GLOBAL VARS
 let currentRoomIndex = 1;
@@ -30,7 +26,7 @@ blankLines(1);
 console.log(`Welcome ${username}!`);
 blankLines(1);
 term.green(fs.readFileSync('./data/Start.txt')); // Show introduction
-blankLines(2);
+blankLines(1);
 
 // MAIN LOOP
 while(!isGameOver) {
@@ -56,10 +52,10 @@ while(!isGameOver) {
 // FUNCTIONS
 function showRoomData(room) {
     // Print current nTurn
-    term.yellow(`Turn ${nTurn}.\n`);
+    console.log(`\n##########################################\n\nTurn ${nTurn}.`);
 
     // Print current room number
-    term.red(`Currently you are in Room ${room.id}. ${room.description}.\n`);
+    term.brightRed(`Currently you are in Room ${room.id}. ${room.description}.\n`);
 
     // Print available directions
     ['north', 'east', 'south', 'west'].forEach(dir => {
@@ -70,14 +66,14 @@ function showRoomData(room) {
     if(room.items.length > 0) {
         room.items.forEach( itemID => {
             const item = searchInDataArrayById(itemID, items);
-            console.log(`\nThere is a ${item.name.toUpperCase()} on the floor.`);
+            term.bgBrightGreen(`\nThere is a ${item.name.toUpperCase()} on the floor.`);
         });
     }
     
     // Print monster description if there is one in the room
     if(room.monster != null) {
         const monster = searchInDataArrayById(room.monster, monsters);
-        console.log(`${monster.name} is waiting to kill you beside a locked door.`);
+        term.bgBrightRed(`\n${monster.name} is waiting to kill you beside a locked door.`);
     }
 
     // Print bag and cash recap
@@ -86,8 +82,8 @@ function showRoomData(room) {
     if(itemsInBagList.length > 0) {
         itemsInBagList.forEach( itemID => {
             const item = searchInDataArrayById(itemID, items);
-            itemsInBagValueList.push(items[i].value);
-            term.cyan(`- ${item.name} (value: ${ite.value.toLocaleString('it-IT')} $)\n`);
+            itemsInBagValueList.push(item.value);
+            term.cyan(`- ${item.name} (value: ${item.value.toLocaleString('it-IT')} $)\n`);
         });
     } else {
         console.log("Currently, your bag is empty.");
@@ -124,6 +120,9 @@ function validateCommand(textInput) {
         case 'drop':
             drop(commandSelector);
             break;
+        case 'attack':
+            attack();
+            break;
         case 'look':
             term.green("\nYou look around.");
             break; // It's actually a no action: run another iteration of the main loop, showing the info about current room
@@ -137,10 +136,6 @@ function validateCommand(textInput) {
     }
 
     isValidInput = true;
-
-    blankLines(1);
-    term.blue('###########################');
-    blankLines(1);
 }
 
 function moveAction(dir) {
@@ -177,7 +172,7 @@ function moveAction(dir) {
 
     // Last case: there is a room in that direction, so move in
     currentRoomIndex = currentRoomData[dir];
-    term.red(`You moved to ${dir}.`);
+    term.red(`\n>> You moved to ${dir}.`);
 }
 
 /**
@@ -186,7 +181,7 @@ function moveAction(dir) {
  * @returns void
  */
 function pick(requestedItem) {
-    const itemsInRoom = rooms[currentRoom - 1].items;
+    const itemsInRoom = rooms[currentRoomIndex- 1].items;
     let itemExistInRoom = false;
 
     if(itemsInRoom.length > 0) {
@@ -219,7 +214,7 @@ function pick(requestedItem) {
  * 
  */
 function drop(requestedItem) {
-    const itemsInRoom = rooms[currentRoom - 1].items;
+    const itemsInRoom = rooms[currentRoomIndex- 1].items;
     let itemExistInBag = false;
 
     if(itemsInBagList.length > 0) {
@@ -246,6 +241,36 @@ function drop(requestedItem) {
     }
     
     if(!itemExistInBag) term.red(`\nThere is no ${requestedItem} in your bag!`);
+}
+
+/**
+ * 
+ */
+function attack() {
+    // There is no monster here!
+    if(currentRoomData.monster === null) {
+        term.red("There is no target to attack here!.\n");
+        return;
+    }
+
+    // Retrieve monster data
+    const monster = searchInDataArrayById(currentRoomData.monster, monsters);
+
+    // Check if player has the right item to kill the monster
+    if(itemsInBagList.includes(monster.itemRequiredToKill)) {
+        const storyEventID = monster.storyEvent;
+        storyEventsList.push(storyEventID);
+        const storyEventData = searchInDataArrayById(storyEventID, storyEvents);
+        storyEventData.result();
+    } else {
+        deathEnding();
+    }
+}
+
+
+function deathEnding() {
+    term.red(fs.readFileSync('./data/EndDead.txt'));
+    isGameOver = true;
 }
 
 function noDeathEnding() {
