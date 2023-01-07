@@ -1,5 +1,5 @@
 # Zelda Game
-You can find the original project from the [TomorrowDevs](tomorrowdevs.com) repo [here](https://github.com/tomorrowdevs-projects/programming-basics/tree/main/projects/m6/004-zelda-game).
+You can find the original project from the <a href="https://www.tomorrowdevs.com">TomorrowDevs</a> repo [here](https://github.com/tomorrowdevs-projects/programming-basics/tree/main/projects/m6/004-zelda-game).
 
 ## Requirements
 * [Node.js](https://nodejs.org/en/)
