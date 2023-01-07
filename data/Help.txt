@@ -1,0 +1,8 @@
+Command list:
+- MOVE [direction] - move the player in the requested direction
+- PICK [item]      - pick the requested item from the room and puts it in the player's bag, if there is one on the room
+- DROP [item]      - drop the requested item in the room, if you have it in your bag
+- ATTACK           - attack the enemy, trying to kill
+- LOOK             - see the room again
+- EXIT             - quit the game
+- HELP             - prints the command list

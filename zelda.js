@@ -143,12 +143,14 @@ function askCommand() {
             break;
         case 'look':
             term.green("\nYou look around.");
-            isValidInput = true;
             break; // It's actually a no action: run another iteration of the main loop, showing the info about current room
         case 'exit':
             isValidInput = true;
             isGameOver = true;
             term.red("\nYou quit the game. Goodbye!");
+            break;
+        case 'help':
+            term.white(fs.readFileSync('./data/Help.txt') + '\n');
             break;
         default:
             invalidCommand();
@@ -296,7 +298,6 @@ function attack() {
  * Prints the death ending message contained in EndDead.txt and sets the isGameOver flag to true (ending the game)
  */
 function deathEnding() {
-    blankLines(1);
     term.red(fs.readFileSync('./data/EndDead.txt'));
     isGameOver = true;
     endGameStats();
