@@ -32,6 +32,7 @@ const storyEvents = [
     {
         id: 3,
         result() {
+            rooms[5].description += "\nThat's where you have found the Princess.";
             term.green("You find the Princess, safe and sound. Go, save her and escape from this maze!\n");
         }
     }
