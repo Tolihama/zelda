@@ -2,7 +2,7 @@
     {
         "id": 1,
         "name": "Room 1",
-        "description": "Room 1 description",
+        "description": "This is the entrance of the castle. There is some light come from west, the exit.",
         "north": null,
         "east": 2,
         "south": 4,
@@ -14,7 +14,7 @@
     {
         "id": 2,
         "name": "Room 2",
-        "description": "Room 2 description",
+        "description": "At the center of the room there is a peculiar pedestial.",
         "north": null,
         "east": 3,
         "south": 5,
@@ -26,7 +26,7 @@
     {
         "id": 3,
         "name": "Room 3",
-        "description": "Room 3 description",
+        "description": "It seems the armory of the castle.",
         "north": null,
         "east": null,
         "south": null,
@@ -38,7 +38,7 @@
     {
         "id": 4,
         "name": "Room 4",
-        "description": "Room 4 description",
+        "description": "Seems there are a lot of treasures here, but no other paths.",
         "north": 1,
         "east": null,
         "south": null,
@@ -50,7 +50,7 @@
     {
         "id": 5,
         "name": "Room 5",
-        "description": "Room 5 description",
+        "description": "You can barely see something here, it's too dark!",
         "north": 2,
         "east": 6,
         "south": null,
@@ -62,7 +62,7 @@
     {
         "id": 6,
         "name": "Room 6",
-        "description": "Room 6 description",
+        "description": "You can barely see something here, it's too dark!",
         "north": null,
         "east": null,
         "south": null,
@@ -74,7 +74,7 @@
     {
         "id": 7,
         "name": "Room 7",
-        "description": "Room 7 description",
+        "description": "On the other side of the room there is a wide window, quite strange for the style of this castle!\nThis room probably is the studio: you can see an old desk at the center, moreover is plenty of books on the shelfs and there are strange things all over the place.",
         "north": null,
         "east": 8,
         "south": null,
@@ -86,7 +86,7 @@
     {
         "id": 8,
         "name": "Room 8",
-        "description": "Room 8 description",
+        "description": "It could be... is there a library in this castle?",
         "north": 5,
         "east": null,
         "south": null,
@@ -98,7 +98,7 @@
     {
         "id": 9,
         "name": "Room 9",
-        "description": "Room 9 description",
+        "description": "",
         "north": 6,
         "east": null,
         "south": null,
