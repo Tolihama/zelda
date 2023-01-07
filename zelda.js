@@ -5,9 +5,7 @@ const fs = require('fs'); // filesystem module
 
 // DEPENDENCIES
 const term = require( 'terminal-kit' ).terminal;
-const prompt = require('prompt-sync')({
-    sigint: true,
-});
+const prompt = require('prompt-sync')({ sigint: true });
 
 // ASSETS
 const items = JSON.parse(fs.readFileSync('./data/Items.txt').toString().trim());
@@ -17,32 +15,31 @@ const { rooms, storyEvents } = require("./js/storyEvents.js");
 // GLOBAL VARS
 let currentRoomIndex = 1;
 let currentRoomData;
-let nTurn = 1;
-let secondsPlayed = 0;
+let nTurns = 1;
 let totalCash = 0;
 let isGameOver = false;
 let isValidInput = false;
 const storyEventsList = [];
 const itemsInBagList = [];
 
-// STARTS GAME
-const gameTimer = setInterval(() => {
-    console.log('timer')
-    secondsPlayed++;
-}, 1000);
-
+// STARTING GAME
+const timeStartGame = Math.round(new Date().getTime() / 1000); // Starting game time
 
 term.green("Hello Hero! What's your name?\n");
 const username = prompt();
-blankLines(1);
-console.log(`Welcome ${username}!`);
-blankLines(1);
-term.green(fs.readFileSync('./data/Start.txt')); // Show introduction
-blankLines(1);
+
+console.log(`\nWelcome ${username}!\n`);
+
+term.green(fs.readFileSync('./data/Start.txt') + '\n'); // Show introduction
+game();
 
 
-// MAIN LOOP
-while(!isGameOver) {
+/* FUNCTIONS */
+
+/**
+ * Main game function
+ */
+function game() {
     // Reset the valid input flag
     isValidInput = false;
 
@@ -51,27 +48,20 @@ while(!isGameOver) {
     showRoomData(currentRoomData);
 
     // Ask valid command
-    while(!isValidInput) {
-        console.log("What do you want to do?");
-        const userCommand = prompt();
-        validateCommand(userCommand.trim().toLocaleLowerCase());
-    }
+    askCommand();
 
-    // Go to next turn
-    nTurn++;
+    nTurns++;
+
+    if(!isGameOver) game();
 }
 
 /**
- * FUNCTIONS
- */
-
-/**
- * Prints all info about current room
+ * Prints all info about a room
  * @param {object} room 
  */
 function showRoomData(room) {
-    // Print current nTurn
-    console.log(`\n##########################################\n\nTurn ${nTurn}.`);
+    // Print current nTurns
+    console.log(`\n##########################################\n\nTurn ${nTurns}.`);
 
     // Print current room number
     term.brightRed(`Currently you are in Room ${room.id}. ${room.description}\n`);
@@ -118,53 +108,60 @@ function showRoomData(room) {
     term.yellow(`Current cash: ${totalCash.toLocaleString('it-IT')} $\n`);
 
     // Print remainder for available commands
-    console.log('\nAvailable Commands: MOVE, PICK, DROP, ATTACK, LOOK, EXIT, HELP\nNote: inputs are case insensitive.\n');
+    console.log('\nAvailable Commands: MOVE, PICK, DROP, ATTACK, LOOK, EXIT, HELP || Inputs are case insensitive.\n');
 }
 
 /**
- * Takes a string (trimmed and in lowercase) and validates as a valid command in the game
- * @param {string} textInput 
- * @returns void
+ * Ask command and validates user input as valid command
  */
-function validateCommand(textInput) {
-    const textInputArr = textInput.split(' ');
+function askCommand() {
+    console.log("What do you want to do?");
+    const textInputArr = prompt().split(' ');
     const command = textInputArr[0];
     const commandSelector = textInputArr.splice(1).join(' ');
 
     switch(command) {
         case 'move':
             if(['north', 'east', 'south', 'west'].includes(commandSelector)) {
-                moveAction(commandSelector);
+                move(commandSelector);
+                isValidInput = true;
             } else {
                 invalidCommand();
-                return;
             }
             break;
         case 'pick':
             pick(commandSelector);
+            isValidInput = true;
             break;
         case 'drop':
             drop(commandSelector);
+            isValidInput = true;
             break;
         case 'attack':
             attack();
+            isValidInput = true;
             break;
         case 'look':
             term.green("\nYou look around.");
+            isValidInput = true;
             break; // It's actually a no action: run another iteration of the main loop, showing the info about current room
         case 'exit':
+            isValidInput = true;
             isGameOver = true;
             term.red("\nYou quit the game. Goodbye!");
             break;
         default:
             invalidCommand();
-            return;
     }
 
-    isValidInput = true;
+    if(!isValidInput) askCommand();
 }
 
-function moveAction(dir) {
+/**
+ * Command MOVE function. Requires a string with the direction requested.
+ * @param {string} dir 
+ */
+function move(dir) {
     // There is a wall in that direction: invalid command
     if(currentRoomData[dir] === null) {
         invalidCommand();
@@ -174,13 +171,11 @@ function moveAction(dir) {
     // There is the exit of the maze in that direction: ask confirm
     if(currentRoomData[dir] === 0) {
 
-        blankLines(1);
-        const princessNotFoundString = storyEventsList.includes(3) ? "" : " You didn't found the princess yet.";
-        term.red(`This is the exit.${princessNotFoundString} Moving in that direction will conclude your adventure. Are you sure to proceed? [YES | NO]\n`);
-        const userConfirm = prompt();
-        blankLines(1);
-
-        switch(userConfirm.toLocaleLowerCase().trim()) {
+        const princessNotFoundString = storyEventsList.includes(3) ? "" : " You have not found the princess yet.";
+        term.red(`\nThis is the exit.${princessNotFoundString} Moving in that direction will conclude your adventure. Are you sure to proceed? [YES | NO]\n`);
+        const userConfirm = prompt().toLocaleLowerCase().trim();
+        
+        switch(userConfirm) {
             // If action is confirmed, trigger the noDeathEnding
             case 'yes':
                 noDeathEnding();
@@ -203,8 +198,7 @@ function moveAction(dir) {
 
 /**
  * Command PICK function. Takes a string as parameter with the name of the item the user wants to pick.
- * @param {string} item 
- * @returns void
+ * @param {string} requestedItem
  */
 function pick(requestedItem) {
     const itemsInRoom = rooms[currentRoomIndex- 1].items;
@@ -237,7 +231,8 @@ function pick(requestedItem) {
 }
 
 /**
- * 
+ * Command DROP function. Takes a string as parameter with the name of the item the user wants to drop.
+ * @param {string} requestedItem 
  */
 function drop(requestedItem) {
     const itemsInRoom = rooms[currentRoomIndex- 1].items;
@@ -270,7 +265,7 @@ function drop(requestedItem) {
 }
 
 /**
- * 
+ * Command ATTACK function.
  */
 function attack() {
     blankLines(1);
@@ -295,7 +290,11 @@ function attack() {
     }
 }
 
+/* ENDGAME FUNCTIONS */
 
+/**
+ * Prints the death ending message contained in EndDead.txt and sets the isGameOver flag to true (ending the game)
+ */
 function deathEnding() {
     blankLines(1);
     term.red(fs.readFileSync('./data/EndDead.txt'));
@@ -303,6 +302,9 @@ function deathEnding() {
     endGameStats();
 }
 
+/**
+ * Prints the no death ending message contained in EndWin.txt or EndLose.txt and sets the isGameOver flag to true (ending the game)
+ */
 function noDeathEnding() {
     blankLines(1);
     if(storyEventsList.includes(3)) {
@@ -314,23 +316,32 @@ function noDeathEnding() {
     endGameStats();
 }
 
+/**
+ * Prints the game statistics
+ */
 function endGameStats() {
-    clearInterval(gameTimer);
-    term.green(`\n\n
-##########################
-GAME STATISTICS
+    const timeEndGame = Math.round(new Date().getTime() / 1000);
 
-Turns played: ${nTurn}
-Time played: ${convertSecondsInHHMMSS(secondsPlayed)}
-Total cash: ${totalCash.toLocaleString('it-IT')} $`);
+    blankLines(1);
+    term.green('\n\n');
+    term.green('##########################\n');
+    term.green('GAME STATISTICS');
+    blankLines(1);
+    term.green(`Turns played: ${nTurns}\n`);
+    term.green(`Time played: ${convertSecondsInHHMMSS(timeEndGame - timeStartGame)}\n`);
+    term.green(`Total cash: ${totalCash.toLocaleString('it-IT')} $`)
 }
 
+
+/* UTILITIES FUNCTION */
+/**
+ * Set the flag isValidInput to false and prints a error message.
+ */
 function invalidCommand() {
     isValidInput = false;
     term.red('Invalid command.\n');
 }
 
-/* UTILITIES FUNCTION */
 /**
  * Prints blank lines on the console
  * @param {number} lines numbers of blank lines to print (default = 1) 
@@ -344,10 +355,10 @@ function blankLines(lines = 1) {
 }
 
 /**
- * Search a specific entity (data) by id in data arrays
+ * Search a specific item by id in data arrays
  * @param {number} id 
  * @param {array} data 
- * @returns {object}
+ * @returns {object|null} the object requested if found, otherwise null
  */
 function searchInDataArrayById(id, data) {
     for(let i = 0; i < data.length; i++) {
@@ -357,10 +368,10 @@ function searchInDataArrayById(id, data) {
 }
 
 /**
- * Search a specific entity (data) by name in data arrays
+ * Search a specific item by name in data arrays
  * @param {string} name 
  * @param {array} data 
- * @returns {object/null} the object requested if found, otherwise null
+ * @returns {object|null} the object requested if found, otherwise null
  */
 function searchInDataArrayByName(name, data) {
     for(let i = 0; i < data.length; i++) {
