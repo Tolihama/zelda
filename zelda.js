@@ -238,6 +238,13 @@ function pick(requestedItem) {
  */
 function drop(requestedItem) {
     const itemsInRoom = rooms[currentRoomIndex- 1].items;
+
+    // There cannot be more than 5 items in a room
+    if(itemsInRoom.length >= 5) {
+        term.red("\nThere are too many items in this room! You don't know where to drop...");
+        return;
+    }
+
     let itemExistInBag = false;
 
     if(itemsInBagList.length > 0) {
